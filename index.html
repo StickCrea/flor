@@ -12,8 +12,45 @@
     />
 
     <style>
+      .lluvia {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1; /* Asegura que la lluvia esté detrás del contenido interactivo */
+}
+
+.gota {
+  position: absolute;
+  width: 30px; /* Ajusta según el tamaño de tu flor */
+  height: 30px;
+  background-image: url('img/clavel.png'); /* Ruta a tu imagen */
+  background-size: contain;
+  background-repeat: no-repeat;
+  animation: caer 30s linear infinite;
+  opacity: 0.8;
+}
+
+.gota img {
+  mix-blend-mode: multiply;
+}
+
+
+@keyframes caer {
+  0% {
+    transform: translateY(-20px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
+}
+
       body {
-        background: linear-gradient(to bottom right, #2b1d23, #15060c);
+        background: linear-gradient(to bottom right, #38272e, #371120);
         color: white;
         font-family: "Segoe UI", sans-serif;
         display: flex;
@@ -87,6 +124,7 @@
     </style>
   </head>
   <body>
+     <div class="lluvia" id="lluvia"></div>
     <div class="carta-container" onclick="toggleCarta()">
       <img
         id="carta-img"
@@ -135,19 +173,40 @@
       let abierta = false;
 
       function toggleCarta() {
-        const carta = document.getElementById("carta-img");
-        const mensaje = document.getElementById("mensaje");
+  const carta = document.getElementById("carta-img");
+  const mensaje = document.getElementById("mensaje");
 
-        if (abierta) {
-          carta.src = "img/carta_cerrada.png";
-          mensaje.classList.remove("visible");
-          carta.classList.remove("opened");
-        } else {
-          carta.src = "img/Carta_abierta.png";
-          mensaje.classList.add("visible");
-          carta.classList.add("opened");
-        }
-      }
+  if (abierta) {
+    carta.src = "img/carta_cerrada.png";
+    mensaje.classList.remove("visible");
+    carta.classList.remove("opened");
+  } else {
+    carta.src = "img/Carta_abierta.png";
+    mensaje.classList.add("visible");
+    carta.classList.add("opened");
+  }
+
+  abierta = !abierta; // ✅ alterna entre abierta y cerrada
+}
+
     </script>
+    
+    <script>
+  // Efecto lluvia
+  const contenedorLluvia = document.getElementById('lluvia');
+  const numGotas = 80; // Puedes ajustar la cantidad
+
+  for (let i = 0; i < numGotas; i++) {
+    let gota = document.createElement('div');
+    gota.classList.add('gota');
+    gota.style.left = Math.random() * 100 + 'vw';
+    gota.style.animationDelay = Math.random() * 5 + 's';
+    gota.style.animationDuration = (10 + Math.random() * 4) + 's';
+    contenedorLluvia.appendChild(gota);
+  }
+</script>
+
+
   </body>
+
 </html>
