@@ -1969,6 +1969,33 @@ body {
   -webkit-transform: scale(0.5) rotate(46deg);
   transform: scale(0.5) rotate(46deg);
 }
+.clavel-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+  padding: 5%;
+  
+}
+
+.clavel-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  
+}
+
+.clavel-btn img {
+  width: 120px;
+  max-width: 30vw;
+  height: auto;
+}
+
+.clavel-btn:hover {
+  transform: scale(1.1);
+}
+
 
 @-webkit-keyframes love {
   50% {

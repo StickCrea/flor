@@ -1,80 +1,112 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
+  <meta charset="UTF-8">
+  <title>Carta de Amor</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Florecer</title>
-    <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: url('img/cla.png') no-repeat center center/cover;
-            font-family: 'Arial', sans-serif;
-        }
+    <link rel="icon" href="img/favicon.ico" type="image/x-icon">    
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">  
+    
 
-        h1, h2 {
-            color: white;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-            text-align: center;
-        }
+  <style>
+    body {
+      background: linear-gradient(to bottom right, #2b1d23, #15060c);
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
 
-        h1 {
-            font-size: 8vw;
-            animation: fadeInOut 3s infinite; /* Animación suave */
-        }
+    .carta-container {
+      text-align: center;
+      cursor: pointer;
+    }
 
-        h2 {
-            font-size: 4vw;
-            margin-top: 20px;
-            animation: pulse 2s infinite; /* Pequeño efecto de pulsación */
-        }
+    .carta-img {
+      width: 400px;
+      transition: transform 0.3s ease;
+    }
 
-        button {
-            font-size: 3vw;
-            padding: 15px 30px;
-            margin-top: 30px;
-            border: none;
-            margin-left: 200px;
-            background-color: #ff3366;
-            color: white;
-            cursor: pointer;
-            border-radius: 50px;
-            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.4);
-        }
+    .carta-container:hover .carta-img {
+      transform: scale(1.05);
+    }
 
-        @keyframes fadeInOut {
-            0%, 100% {
-                opacity: 0.8;
-            }
-            50% {
-                opacity: 1;
-            }
-        }
+    .mensaje {
+      margin-top: 100px;
+      padding: 50px;
+      background: rgba(255, 192, 203, 0.2);
+      border-radius: 15px;
+      backdrop-filter: blur(5px);
+      display: none;
+      max-width: 400px;
+      text-align: left;
+      color: #fff;
+    }
 
-        @keyframes pulse {
-            0%, 100% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.05);
-            }
-        }
-    </style>
+    .visible {
+      display: block;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
 <body>
-    <div>
-        <h1>Luisa Fernada Moreno(●'◡'●)💕</h1>
-        <h2>Tengo un regalo para ti✍(◔◡◔)</h2>
-        <h2>con todo cariño🤗(◔◡◔)</h2>
-        <h2>Gracias por conformarte con tampoco, te mereces una galacia</h2>
-        <h2>Mientras pueda te hare sentir lo mucho que te pueden querer, hacerte olvidar de tus heridas y demonios 
-        </h2>
-        <button onclick="window.location.href='rosas.html'">Ver regalo☞💛</button>
-    </div>
+
+  <div class="carta-container" onclick="toggleCarta()">
+    <img id="carta-img" src="img/carta_cerrada.png" alt="Carta Cerrada" class="carta-img">
+    <div id="mensaje" class="mensaje">
+  <p>Este mensaje es para ti, para recordarte lo hermosa que eres, por dentro y por fuera. No solo por lo que se ve, sino por lo que has sido capaz de ser en cada momento difícil que enfrentaste con valentía.</p>
+  
+  <p>Gracias por cada instante compartido, por cada sonrisa, por cada gesto sincero. Fuiste luz en mi camino y, sin saberlo, dejaste huellas que nunca se van a borrar. Agradezco profundamente todo lo que me diste, incluso cuando no tenías mucho para dar.</p>
+  
+  <p>Donde sea que estés, no olvides que estás luchando por tus sueños, que cada paso que das te acerca a ellos. Y aunque a veces duela, aunque el camino se sienta solo, siempre habrá alguien que cree en ti, que te admira y que te apoya, aunque sea en silencio.</p>
+
+  <p>El clavel es el botón que te lleva a seguir adelante, a lo nuevo. El sol, en cambio, te devuelve al origen, al calor de lo vivido. Un abrazo inmenso y un beso en la frente, con cariño infinito,</p>
+
+  <p><strong>— Stiven</strong></p>
+</div>
+
+  </div> 
+
+ <!-- Botón en forma de clavel -->
+<div class="clavel-container">
+  <a href="rosas.html">
+    <button class="clavel-btn">
+      <img src="img/clavel.png" alt="Clavel" />
+    </button>
+  </a>
+</div>
+
+
+
+  <script>
+    let abierta = false;
+
+    function toggleCarta() {
+      const carta = document.getElementById('carta-img');
+      const mensaje = document.getElementById('mensaje');
+
+      if (abierta) {
+        carta.src = 'img/carta_cerrada.png';
+        mensaje.classList.remove('visible');
+      } else {
+        carta.src = 'img/Carta_abierta.png';
+        mensaje.classList.add('visible');
+      }
+
+      abierta = !abierta;
+    }
+  </script>
+
+
 </body>
+ 
 </html>
