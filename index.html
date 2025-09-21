@@ -1,212 +1,309 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Flor</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" href="img/favicon.ico" type="image/x-icon" />
-    <link rel="stylesheet" href="styles.css" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-    />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reproductor - Morocha</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg,#1e1e1e,#000);
+      color: #fff;
+      min-height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;
+      padding:40px 20px;
+      overflow:hidden;
+    }
 
-    <style>
-      .lluvia {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 1; /* Asegura que la lluvia esté detrás del contenido interactivo */
-}
+    .player-wrap {
+      width:360px;
+      text-align:center;
+      position:relative;
+      z-index:2;
+    }
 
-.gota {
-  position: absolute;
-  width: 30px; /* Ajusta según el tamaño de tu flor */
-  height: 30px;
-  background-image: url('img/clavel.png'); /* Ruta a tu imagen */
-  background-size: contain;
-  background-repeat: no-repeat;
-  animation: caer 30s linear infinite;
-  opacity: 0.8;
-}
+    .dedication {
+      font-size:22px;
+      font-weight:700;
+      margin-bottom:10px;
+      color:#3ac965;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      gap:8px;
+    }
+    .dedication .heart {
+      font-size:24px;
+      color:#c084fc;
+    }
 
-.gota img {
-  mix-blend-mode: multiply;
-}
+    .cover img {
+      width:100%;
+      border-radius:12px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+    }
 
+    .title { font-size:20px; font-weight:700; margin-top:12px; text-align:left; }
+    .artist { color:#b3b3b3; text-align:left; margin-bottom:12px; }
 
-@keyframes caer {
-  0% {
-    transform: translateY(-20px);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(100vh);
-    opacity: 0;
-  }
-}
+    .controls { display:flex; justify-content:center; gap:22px; margin:12px 0; }
+    .controls button { background:none; border:none; color:#fff; font-size:26px; cursor:pointer; }
 
-      body {
-        background: linear-gradient(to bottom right, #38272e, #371120);
-        color: white;
-        font-family: "Segoe UI", sans-serif;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
-      }
+    .progress-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+    .time { color:#b3b3b3; font-size:13px; width:36px; text-align:center; }
+    .progress-bar { flex:1; height:6px; background:#333; border-radius:6px; cursor:pointer; position:relative; }
+    .progress { height:100%; width:0%; background:#c084fc; border-radius:6px; }
 
-      .carta-container {
-        text-align: center;
-        cursor: pointer;
-      }
+    .bars { display:flex; justify-content:center; gap:6px; margin:14px 0; align-items:flex-end; height:40px; }
+    .bar { width:6px; background:#ffcc00; height:12px; border-radius:4px; transition:height 0.18s ease; }
+    .bar.paused { background:#666; }
 
-      .carta-img {
-        width: 400px;
-        transition: transform 0.3s ease;
-      }
+    /* Lyrics */
+    .lyrics-box { margin-top:18px; height:200px; overflow:auto; padding:10px; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:8px; }
+    .line { color:#9aa0a6; margin:8px 0; font-size:15px; transition:all .25s; }
+    .line.active { color:#c084fc; font-weight:700; font-size:16px; }
 
-      .carta-container:hover .carta-img {
-        transform: scale(1.05);
-      }
+    /* Offset controls */
+    .offset-controls { display:flex; justify-content:center; gap:12px; margin-top:10px; align-items:center; color:#bdbdbd; }
+    .offset-controls button { background:#2a2a2a; color:#fff; border:1px solid #333; padding:6px 10px; border-radius:8px; cursor:pointer; }
+    .offset-display { min-width:120px; text-align:center; font-size:14px; color:#ddd; }
 
-      .mensaje {
-        margin-top: 50px;
-        padding: 50px;
-        background: rgba(255, 192, 203, 0.2);
-        border-radius: 15px;
-        backdrop-filter: blur(5px);
-        display: none;
-        max-width: 400px;
-        text-align: left;
-        color: #fff;
-      }
+    /* Mensaje final */
+    .final-message {
+      margin-top:16px;
+      font-size:14px;
+      color:#bbb;
+      font-style:italic;
+    }
 
-      .visible {
-        display: block;
-        animation: fadeIn 0.5s ease;
-      }
+    /* Corazones flotantes */
+    .heart-float {
+      position:absolute;
+      bottom:20px;
+      font-size:20px;
+      color:#c084fc;
+      animation: floatUp 4s linear forwards;
+      z-index:1;
+    }
 
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(-10px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-      @media (max-width: 600px) {
-        .mensaje {
-          padding: 25px;
-          font-size: 15px;
-          line-height: 1.6;
-          margin-top: 50px;
-        }
+    @keyframes floatUp {
+      0% { transform:translateY(0) scale(1); opacity:1; }
+      50% { opacity:0.8; }
+      100% { transform:translateY(-100vh) scale(1.6); opacity:0; }
+    }
+  </style>
+</head>
+<body>
 
-        .carta-img {
-          width: 80%;
-        }
-
-        .clavel-container {
-          margin-top: 1.5rem;
-        }
-
-        .clavel-btn img {
-          width: 100px;
-        }
-      }
-    </style>
-  </head>
-  <body>
-     <div class="lluvia" id="lluvia"></div>
-    <div class="carta-container" onclick="toggleCarta()">
-      <img
-        id="carta-img"
-        src="img/carta_cerrada.png"
-        alt="Carta Cerrada"
-        class="carta-img"
-      />
-      <div id="mensaje" class="mensaje">
-        <p>
-          Este mensaje es para ti, para recordarte lo hermosa que eres, por
-          dentro y por fuera. No solo por lo que se ve, sino por lo que has sido
-          capaz de ser en cada momento difícil que te ha tocado vivir.
-        </p> <br>
-
-        <p>
-          Gracias por los momentos que compartido, por cada sonrisa, por cada gesto
-          sincero. Fuiste serás una persona importante en mi vida, sin saberlo, dejaste huellas que
-          nunca se van a borrar. Agradezco profundamente todo tú cariño.
-        </p> <br>
-        <p>
-          Sé que a veces la vida puede ser dura, que hay momentos en los que
-          sientes que no puedes más, pero quiero que sepas que siempre estaré
-          aquí para ti. No importa la distancia, ni el tiempo, siempre habrá un
-          lugar en mi corazón para ti.
-        </p> <br>
-        <p>
-          El clavel es el botón que te lleva a seguir adelante, a lo nuevo. El
-          sol, en cambio, te devuelve al origen, al calor de lo vivido. Un
-          abrazo inmenso y un beso en la frente, con cariño infinito,
-        </p><br>
-
-        <p><strong>— Stiven</strong></p>
-      </div>
+  <div class="player-wrap">
+    <div class="dedication">
+      Te la dedico preciosa <span class="heart">💜</span>
     </div>
 
-    <!-- Botón en forma de clavel -->
-    <div class="clavel-container">
-      <a href="rosas.html">
-        <button class="clavel-btn">
-          <img src="img/clavel.png" alt="Clavel" />
-        </button>
-      </a>
+    <div class="cover">
+      <img src="img/morocha_mj.png" alt="Morocha - Portada">
     </div>
 
-    <script>
-      let abierta = false;
+    <div class="title">Morocha</div>
+    <div class="artist">Milo J</div>
 
-      function toggleCarta() {
-  const carta = document.getElementById("carta-img");
-  const mensaje = document.getElementById("mensaje");
+    <audio id="audio" src="./Morocha - MiloJ.mp3"></audio>
 
-  if (abierta) {
-    carta.src = "img/carta_cerrada.png";
-    mensaje.classList.remove("visible");
-    carta.classList.remove("opened");
-  } else {
-    carta.src = "img/Carta_abierta.png";
-    mensaje.classList.add("visible");
-    carta.classList.add("opened");
+    <div class="controls">
+      <button id="prev">⏮</button>
+      <button id="play">▶️</button>
+      <button id="next">⏭</button>
+    </div>
+
+    <div class="progress-row">
+      <div class="time" id="current-time">0:00</div>
+      <div class="progress-bar" id="progress-bar"><div class="progress" id="progress"></div></div>
+      <div class="time" id="duration">0:00</div>
+    </div>
+
+    <div class="bars" id="bars">
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
+    </div>
+
+    <!-- Offset controls -->
+    <div class="offset-controls">
+      <button id="decOffset">-0.5s</button>
+      <div class="offset-display">Offset: <span id="offsetValue">0.0</span>s</div>
+      <button id="incOffset">+0.5s</button>
+    </div>
+
+     <!-- Lyrics -->
+    <div class="lyrics-box" id="lyricsBox">
+      <p class="line" data-start="21">Nena, si querés, vámono' ahora</p>
+      <p class="line" data-start="24">No dejemos que pasen las horas</p>
+      <p class="line" data-start="28">Solo dame una oportunidad</p>
+      <p class="line" data-start="30">Y tal vez mañana no estés más sola</p>
+      <p class="line" data-start="34">No soy pa' vos, pero pido una chance</p>
+      <p class="line" data-start="36">Por la noche espero tu mensaje</p>
+      <p class="line" data-start="39">Y sé que no crees, pero, morocha</p>
+      <p class="line" data-start="42">Tu alma rota va a recuperarse, yeah</p>
+      <p class="line" data-start="47">Por fuera sos linda</p>
+      <p class="line" data-start="48">Pero es que por dentro no hay otra como vos</p>
+      <p class="line" data-start="51">Ni pensándola dos veces</p>
+      <p class="line" data-start="53">Sos un ser libre y te deseo lo mejor</p>
+      <p class="line" data-start="55">Por eso te quiero pa' mí los días, los años, los meses</p>
+      <p class="line" data-start="58">Desde hace tiempo y por las noches me hago imágenes mentales</p>
+      <p class="line" data-start="61">De lo que sería un amorío perfecto</p>
+      <p class="line" data-start="65">No somos tan políticamente correctos</p>
+      <p class="line" data-start="67">Hagámonos los mudos y dejemos hablar al tiempo</p>
+      <p class="line" data-start="70">Y me gusta esa cara tierna que pones cuando te frustras</p>
+      <p class="line" data-start="76">Y es que nunca va a haber nada igual como tus besos en la nuca</p>
+      <p class="line" data-start="81">Porque sos de barrio</p>
+      <p class="line" data-start="84">Y yo soy de barrio</p>
+      <p class="line" data-start="86">Los dos somos uno</p>
+      <p class="line" data-start="89">Sin límites ni horario</p>
+      <p class="line" data-start="92">Nena, si querés, vámono' ahora</p>
+      <p class="line" data-start="95">No dejemos que pasen las horas</p>
+      <p class="line" data-start="98">Solo dame una oportunidad</p>
+      <p class="line" data-start="100">Y tal vez mañana no estés más sola</p>
+      <p class="line" data-start="103">No soy pa' vos, pero pido una chance</p>
+      <p class="line" data-start="107">Por la noche espero tu mensaje</p>
+      <p class="line" data-start="109">Y sé que no crees, pero, morocha</p>
+      <p class="line" data-start="112">Tu alma rota va a recuperarse, yeah</p>
+    </div>
+
+    <div class="final-message">
+      Al final debes escuchar la canción completa para que te redirija a otra sección que te va a gustar 💜
+    </div>
+  </div>
+
+<script>
+  // ELEMENTOS
+  const audio = document.getElementById('audio');
+  const playBtn = document.getElementById('play');
+  const progress = document.getElementById('progress');
+  const progressBar = document.getElementById('progress-bar');
+  const currentTimeEl = document.getElementById('current-time');
+  const durationEl = document.getElementById('duration');
+  const barElems = document.querySelectorAll('.bar');
+  const lines = document.querySelectorAll('.line');
+
+  // OFFSET
+  let lyricsOffset = 0.0;
+  const offsetValueEl = document.getElementById('offsetValue');
+  document.getElementById('incOffset').addEventListener('click', () => {
+    lyricsOffset = +(lyricsOffset + 0.5).toFixed(1);
+    offsetValueEl.textContent = lyricsOffset.toFixed(1);
+  });
+  document.getElementById('decOffset').addEventListener('click', () => {
+    lyricsOffset = +(lyricsOffset - 0.5).toFixed(1);
+    offsetValueEl.textContent = lyricsOffset.toFixed(1);
+  });
+
+  // Play / Pause
+  let isPlaying = false;
+  playBtn.addEventListener('click', () => {
+    if (isPlaying) { audio.pause(); playBtn.textContent = '▶️'; }
+    else { audio.play(); playBtn.textContent = '⏸️'; }
+    isPlaying = !isPlaying;
+    setBarsActive(isPlaying);
+  });
+
+  function setBarsActive(active) {
+    barElems.forEach(b => {
+      if (active) b.classList.remove('paused');
+      else b.classList.add('paused');
+    });
   }
 
-  abierta = !abierta; // ✅ alterna entre abierta y cerrada
-}
-
-    </script>
-    
-    <script>
-  // Efecto lluvia
-  const contenedorLluvia = document.getElementById('lluvia');
-  const numGotas = 80; // Puedes ajustar la cantidad
-
-  for (let i = 0; i < numGotas; i++) {
-    let gota = document.createElement('div');
-    gota.classList.add('gota');
-    gota.style.left = Math.random() * 100 + 'vw';
-    gota.style.animationDelay = Math.random() * 5 + 's';
-    gota.style.animationDuration = (10 + Math.random() * 4) + 's';
-    contenedorLluvia.appendChild(gota);
+  function updateBars(currentTime) {
+    barElems.forEach((b, i) => {
+      const base = 12 + Math.abs(Math.sin((currentTime + i) * 2.2)) * 36;
+      b.style.height = `${Math.round(base)}px`;
+    });
   }
+
+  // Progreso + letras
+  audio.addEventListener('timeupdate', () => {
+    const current = audio.currentTime || 0;
+    const dur = audio.duration || 0;
+    if (dur > 0) {
+      progress.style.width = `${(current / dur) * 100}%`;
+    }
+    currentTimeEl.textContent = formatTime(current);
+    if (audio.duration) durationEl.textContent = formatTime(audio.duration);
+
+    updateBars(current);
+    syncLyricsWithOffset(current);
+  });
+
+  progressBar.addEventListener('click', (e) => {
+    const rect = progressBar.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const pct = clickX / rect.width;
+    if (audio.duration) audio.currentTime = pct * audio.duration;
+  });
+
+  function syncLyricsWithOffset(currentTime) {
+    lines.forEach(el => {
+      const start = parseFloat(el.dataset.start || '0');
+      const showTime = start + lyricsOffset;
+      if (currentTime >= showTime) {
+        lines.forEach(l => l.classList.remove('active'));
+        el.classList.add('active');
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
+  }
+
+  function formatTime(sec) {
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60).toString().padStart(2,'0');
+    return `${m}:${s}`;
+  }
+
+  audio.addEventListener('loadedmetadata', () => {
+    if (audio.duration) durationEl.textContent = formatTime(audio.duration);
+  });
+
+  document.getElementById('prev').addEventListener('click', () => { audio.currentTime = 0; });
+  document.getElementById('next').addEventListener('click', () => {
+    audio.currentTime = audio.duration ? Math.max(0, audio.duration - 3) : 0;
+  });
+
+  setBarsActive(false);
+  offsetValueEl.textContent = lyricsOffset.toFixed(1);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.code === 'Space') { e.preventDefault(); playBtn.click(); }
+  });
+
+  // --- CORAZONES flotando ---
+  function createHeart() {
+    const heart = document.createElement("div");
+    heart.classList.add("heart-float");
+    heart.textContent = "💜";
+    heart.style.left = Math.random() * 100 + "vw";
+    heart.style.fontSize = 18 + Math.random() * 16 + "px";
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 4000);
+  }
+
+  // Cada 10s lanzamos entre 2-4 corazones
+  setInterval(() => {
+    if (!audio.paused) {
+      const qty = Math.floor(Math.random() * 50) + 2;
+      for (let i = 0; i < qty; i++) {
+        setTimeout(createHeart, i * 400);
+      }
+    }
+  }, 10000);
+   // --- REDIRECCIÓN AL TERMINAR ---
+  audio.addEventListener("ended", () => {
+    window.location.href = "rosas.html";
+  });
 </script>
-
-
-  </body>
-
+</body>
 </html>
